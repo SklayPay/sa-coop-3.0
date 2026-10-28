@@ -10,12 +10,25 @@
 #include <cstdint>
 
 #include "shared/game/Types.h"
+#include "shared/game/version/GameVersion.h"
 
 namespace game {
 
 template <typename T>
 inline T& Ref(uintptr_t addr) {
     return *reinterpret_cast<T*>(addr);
+}
+
+// Porting helpers: these take a gta_sa.exe 1.0 US address and translate it through the version
+// table. The old Ref/Call stay as they are for runtime pointers (pool objects, plugin data).
+template <typename T>
+inline T& Ref10(uintptr_t addr10) {
+    return *reinterpret_cast<T*>(version::Resolve(addr10));
+}
+
+template <uintptr_t A, typename R = void, typename... Args>
+inline R Call10(Args... args) {
+    return reinterpret_cast<R(__cdecl*)(Args...)>(version::Resolve(A))(args...);
 }
 template <typename T>
 inline T& Field(const void* base, int off) {

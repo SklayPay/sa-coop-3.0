@@ -19,6 +19,7 @@
 #include "shared/api/net-session/Session.h"
 #include "shared/config/Config.h"
 #include "shared/game/Game.h"
+#include "shared/game/version/GameVersion.h"
 #include "shared/lib/memory/Memory.h"
 #include "shared/ui/chat/Chat.h"
 #include "shared/ui/input/Input.h"
@@ -590,25 +591,35 @@ void Init(void* hModule) {
     InstallCrashHandler(coopDir);
     if (cfg.verboseLog) StartHangDetector(15);
 
-    // only gta_sa.exe 1.0 US is supported: every address in this mod is version specific
-    wchar_t exePath[MAX_PATH];
-    GetModuleFileNameW(nullptr, exePath, MAX_PATH);
-    WIN32_FILE_ATTRIBUTE_DATA fad{};
-    GetFileAttributesExW(exePath, GetFileExInfoStandard, &fad);
-    LOGI("gta_sa.exe size: %u", (unsigned)fad.nFileSizeLow);
-    // 1.0 US signature (both HOODLUM and "compact" executables share all addresses)
-    if (*(uint32_t*)0x82457C != 0x94BF) {
-        LOGE("Unsupported gta_sa.exe (size %u). SA:COOP requires GTA SA 1.0 US.", (unsigned)fad.nFileSizeLow);
-        MessageBoxW(nullptr,
-                    TR(L"SA:COOP работает только с GTA San Andreas версии 1.0 US.\n"
-                       L"Если игра из Steam или Rockstar Games Launcher, откатите её до 1.0 US\n"
-                       L"программой GTA SA Downgrader.\n\n"
-                       L"Пока мод выключен.",
-                       L"SA:COOP works only with GTA San Andreas 1.0 US.\n"
-                       L"If your game comes from Steam or the Rockstar Games Launcher, downgrade it to 1.0 US\n"
-                       L"with GTA SA Downgrader.\n\n"
-                       L"The mod stays off for now."),
-                    L"SA:COOP", MB_ICONWARNING);
+    // The mod is built against gta_sa.exe 1.0 US: every constant in the client is an address of
+    // that image. Other executables are detected here and can be translated by the table in
+    // shared/game/version, but 3.0 is not enabled until that table covers the whole client.
+    const auto& ver = game::version::Get();
+    LOGI("gta_sa.exe: %s, size %u", ver.name, (unsigned)ver.exeSize);
+    if (!game::version::IsSupported()) {
+        LOGE("Unsupported gta_sa.exe: %s (size %u). SA:COOP requires GTA SA 1.0 US.",
+             ver.name, (unsigned)ver.exeSize);
+        const wchar_t* msg = nullptr;
+        if (game::version::IsSteamFamily() || ver.id == game::version::Id::V3_0) {
+            msg = TR(L"Обнаружена GTA San Andreas 3.0 / Steam / RGL.\n"
+                     L"Порт на эту версию ещё не завершён: таблица адресов\n"
+                     L"src/client/shared/game/version/Addresses.cpp заполнена не полностью.\n\n"
+                     L"Пока мод выключен. Для игры прямо сейчас нужна версия 1.0 US.",
+                     L"GTA San Andreas 3.0 / Steam / RGL detected.\n"
+                     L"The port to this version is not finished yet: the address table in\n"
+                     L"src/client/shared/game/version/Addresses.cpp is incomplete.\n\n"
+                     L"The mod stays off for now. To play today, use GTA SA 1.0 US.");
+        } else {
+            msg = TR(L"SA:COOP работает только с GTA San Andreas версии 1.0 US.\n"
+                     L"Если игра из Steam или Rockstar Games Launcher, откатите её до 1.0 US\n"
+                     L"программой GTA SA Downgrader.\n\n"
+                     L"Пока мод выключен.",
+                     L"SA:COOP works only with GTA San Andreas 1.0 US.\n"
+                     L"If your game comes from Steam or the Rockstar Games Launcher, downgrade it to 1.0 US\n"
+                     L"with GTA SA Downgrader.\n\n"
+                     L"The mod stays off for now.");
+        }
+        MessageBoxW(nullptr, msg, L"SA:COOP", MB_ICONWARNING);
         return;
     }
 
