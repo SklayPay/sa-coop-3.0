@@ -11,9 +11,9 @@ namespace game::version {
 namespace {
 
 constexpr uintptr_t kGta10Base = 0x400000;
-// The 1.0 US image is a little under 0xC98000 bytes; addresses outside it are heap objects,
-// plugin code or Windows, which must not be translated.
-constexpr uintptr_t kGta10End = 0xC98000;
+// The 1.0 US image ends with the HOODLUM section at 0x1577000. Addresses outside that range are
+// heap objects, plugin code or Windows, which must not be translated.
+constexpr uintptr_t kGta10End = 0x1577000;
 
 bool Readable(uintptr_t address, size_t size) {
     MEMORY_BASIC_INFORMATION mbi{};

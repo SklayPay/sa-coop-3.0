@@ -1,0 +1,98 @@
+v10,v30,reason
+0x446610,0x44A4A0,callgraph m=33 sec=14 ratio=0.90
+0x44AA50,0x44EC60,callgraph m=30 sec=13 ratio=0.94
+0x5B1720,0x5CE730,callgraph m=20 sec=11 ratio=0.97
+0x588050,0x5A7A50,callgraph m=16 sec=10 ratio=1.00
+0x424F80,0x426900,callgraph m=14 sec=7 ratio=0.96
+0x4C0BD0,0x4CA960,callgraph m=14 sec=8 ratio=0.89
+0x58FAE0,0x59E520,callgraph m=12 sec=9 ratio=0.96
+0x4341C0,0x437150,callgraph m=11 sec=5 ratio=0.90
+0x611FC0,0x633530,callgraph m=10 sec=4 ratio=0.92
+0x5B25F0,0x5CC190,callgraph m=10 sec=3 ratio=0.70
+0x437C20,0x43AE60,callgraph m=9 sec=8 ratio=0.98
+0x565B70,0x57FDE0,callgraph m=6 sec=3 ratio=1.05
+0x4EB890,0x4F74B0,callgraph m=5 sec=4 ratio=0.89 prologue exact
+0x616300,0x637EB0,callgraph m=4 sec=3 ratio=0.80
+0x6B3E90,0x6E2230,callgraph m=3 sec=3 ratio=1.05 prologue exact
+0x5D2D70,0x5EF4C0,callgraph m=3 sec=2 + wrapper callee match
+0x619060,0x63AB50,adjacent to known 0x6190A0 pair + prologue exact
+0x562120,0x57C050,callgraph m=2 sec=1 + body alignment
+0x449760,0x44D7B0,pattern_scan unique + prologue exact
+0x5D3160,0x5EF8C0,pattern_scan unique + prologue exact
+0x5D0880,0x5ECFC0,wrapper call/jmp targets match
+0x5D0890,0x5ECFD0,wrapper call/jmp targets match
+0x5D4B40,0x5F12D0,callee of 0x5D0880/0x5ECFC0 pair
+0x5D4940,0x5F10D0,jmp target of 0x5D0880/0x5ECFC0 pair
+0x5D4A40,0x5F11E0,jmp target of 0x5D0890/0x5ECFD0 pair
+0x405850,0x4058C0,1.0 thunk -> body 0x1565190; 3.0 body in .text
+0x1565190,0x4058C0,body of 0x405850 thunk
+0x405890,0x405900,1.0 thunk -> body 0x156A140; 3.0 body in .text
+0x156A140,0x405900,body of 0x405890 thunk
+0x4058D0,0x405940,1.0 thunk -> body 0x156DE30; 3.0 body in .text
+0x156DE30,0x405940,body of 0x4058D0 thunk
+0x448550,0x44C4E0,1.0 thunk -> body 0x156D8D0
+0x156D8D0,0x44C4E0,body of 0x448550 thunk (similarity 0.880)
+0x44CE80,0x451210,1.0 thunk -> body 0x156AD90
+0x156AD90,0x451210,body of 0x44CE80 thunk (similarity 0.944)
+0x444530,0x4482D0,1.0 thunk -> body 0x1568E00
+0x1568E00,0x4482D0,body of 0x444530 thunk (similarity 0.762)
+0x446F90,0x44AE00,1.0 thunk -> body 0x1569BF0
+0x1569BF0,0x44AE00,body of 0x446F90 thunk (similarity 0.800)
+0x44A170,0x44E290,VT 0.913, CIplStore helper
+0x469F00,0x46F670,VT 0.740, same prologue
+0x53E920,0x551110,VT 0.687, same prologue calls CTimer
+0x644470,0x66AD40,VT 0.680, SEH prologue exact
+0x748710,0x7826D0,VT 0.798, same frame allocation
+0x4F1290,0x4FE500,VT 0.867, SEH prologue exact
+0x496E00,0x49E4D0,VT 0.617, SEH prologue exact
+0x441390,0x444D70,CGameLogic::IsCoopGameGoingOn: exact body, cmp C0F890/C0FA20
+0x156CF30,0x444D70,body of 0x441390 thunk
+0x442020,0x445C10,CGameLogic::IsPlayerUse2PlayerControls: exact body
+0x156FF70,0x445C10,body of 0x442020 thunk
+0x441E10,0x4459D0,CGameLogic::IsPlayerAllowedToGoInThisDirection: entry thunk
+0x441E16,0x4459D0,body of 0x441E10; data refs B7CF28->C0FA20 etc
+0x4E07A0,0x4EBD40,gap order 5 + prologue exact
+0x4E4A20,0x4F0190,gap order 7 + prologue exact
+0x532450,0x543C10,gap order 1 + prologue exact
+0x565510,0x57F740,gap order 8 + CPool ref B74490->C01038
+0x587CE0,0x5A76D0,gap order 2 + 0xaf index math exact
+0x5968E0,0x5AE990,gap order 2 + prologue exact
+0x4C89B0,0x4D32D0,gap order 1 + prologue exact
+0x4D4410,0x4DEDD0,gap order 1 + SEH prologue exact
+0x50C140,0x51A2D0,gap order 1 + body exact
+0x507290,0x514C00,gap order 6 + wrapper body exact
+0x5072A0,0x514C10,gap order 6 + wrapper body exact
+0x5072B0,0x514C20,gap order 6 + wrapper body exact
+0x485E00,0x48C3D0,gap order 2 + same float compare
+0x69F370,0x6CBFF0,gap order 1 + prologue exact
+0x6CE340,0x7041F0,gap order 1 + prologue exact
+0x6CAC20,0x7006D0,gap order 3 + same field offsets
+0x6CAC70,0x700720,gap order 3 + same field offsets
+0x6F3F40,0x6F5780,gap order 2 + prologue exact
+0x739A40,0x7726D0,gap order 8 + 0xC89110->0xD144B0
+0x6924F0,0x6BFF30,gap order 2 + prologue exact
+0x746060,0x77FEF0,gap order 1 + same body
+0x583530,0x5A2860,gap order 4 + same body shape
+0x728CB0,0x760AB0,gap order 4 + same loop 0x3cc
+0x40F640,0x419F80,gap order 1 + same index math
+0x4F1530,0x4FE7B0,CMissionCleanup? byte-exact body: byte[ecx+0x15], jmp [eax+0xC], ret -8
+0x54FF60,0x5680C0,GetPedRef: exact 44-byte body, PedPool B74490->C01038, magic 0x41ee7ca7
+0x550020,0x568180,GetObjectRef: exact 44-byte body, ObjectPool B7449C->C01044, magic 0x13e22cbd
+0x5072C0,0x514C30,wrapper add ecx,0x2a0; jmp target sim 0.84
+0x5072D0,0x514C40,wrapper add ecx,0x2a0; jmp target sim 1.00
+0x5072E0,0x514C50,wrapper add ecx,0x2a0; jmp target sim 0.44
+0x5072F0,0x514C60,wrapper add ecx,0x2a0; jmp target sim 0.62
+0x507300,0x514C70,wrapper add ecx,0x2a0; jmp target 0x4F7CE0 body same as 0x4EC0C0
+0x507310,0x514C80,wrapper add ecx,0x2a0; jmp target 0x4F7D20 body same as 0x4EC100
+0x507320,0x514C90,wrapper add ecx,0x2a0; jmp target 0x4F7D20 body same as 0x4EC100
+0x507330,0x514CA0,wrapper add ecx,0x2a0; jmp target 0x4F7D20 body same as 0x4EC100
+0x7468E0,0x780720,IsAlreadyRunning: VT Exact Function Instructions/Mnemonics 1.000, 91/91 bytes
+0x54FF90,0x601920,GetPed: PedPool C01038, stride 0x7c4, calls CPool::RemoveRef
+0x54FFC0,0x568120,GetVehicleRef: exact 44-byte body, VehiclePool B74494->C0103C
+0x54FFF0,0x71F250,GetVehicle: VehiclePool C0103C, stride 0xa18, calls 0x711380
+0x550050,0x5BB1D0,GetObject: ObjectPool C01044, stride 0x19c, calls 0x5B8570
+0x507300,0x514C70,wrapper add ecx,0x2a0; jmp 0x4F7CE0 (==0x4EC0C0 body)
+0x507320,0x514C90,wrapper add ecx,0x2a0; jmp 0x4F7D20 (==0x4EC100 body)
+0x442FCF,0x446CAA,push 0x2d0 followed by call 0x4414C0->0x444EC0; unique occurrence 1/2
+0x44337A,0x44704A,push 0x2d0 followed by call 0x4414C0->0x444EC0; unique occurrence 2/2
+0x8A5CC8,0x913470,CCheat::m_aCheatHashKeys[92]: 368 bytes identical in 3.0 .data

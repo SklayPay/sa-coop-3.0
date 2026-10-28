@@ -14,21 +14,36 @@
 
 namespace game {
 
+// Ref/Call take a gta_sa.exe 1.0 US address and translate it through the version table on other
+// supported builds. On 1.0 US Resolve is the identity, so the behavior is unchanged. Addresses
+// outside the game image (pool objects, plugin data) are returned unchanged. When an image
+// address is missing from the table, the original address is kept: a wrong read is easier to
+// diagnose than a null dereference, and the version gate keeps 3.0 from running at all.
 template <typename T>
 inline T& Ref(uintptr_t addr) {
-    return *reinterpret_cast<T*>(addr);
+    uintptr_t at = version::Resolve(addr);
+    return *reinterpret_cast<T*>(at ? at : addr);
 }
 
-// Porting helpers: these take a gta_sa.exe 1.0 US address and translate it through the version
-// table. The old Ref/Call stay as they are for runtime pointers (pool objects, plugin data).
+// Porting helpers kept for code that wants to be explicit about translating an address.
 template <typename T>
 inline T& Ref10(uintptr_t addr10) {
-    return *reinterpret_cast<T*>(version::Resolve(addr10));
+    uintptr_t at = version::Resolve(addr10);
+    return *reinterpret_cast<T*>(at ? at : addr10);
+}
+
+// A translated data pointer for code that passes an address to memcpy/memset or compares it.
+// Falls back to the 1.0 address when the table has no entry, matching Ref/Call.
+template <typename T>
+inline T* Ptr10(uintptr_t addr10) {
+    uintptr_t at = version::Resolve(addr10);
+    return reinterpret_cast<T*>(at ? at : addr10);
 }
 
 template <uintptr_t A, typename R = void, typename... Args>
 inline R Call10(Args... args) {
-    return reinterpret_cast<R(__cdecl*)(Args...)>(version::Resolve(A))(args...);
+    uintptr_t at = version::Resolve(A);
+    return reinterpret_cast<R(__cdecl*)(Args...)>(at ? at : A)(args...);
 }
 template <typename T>
 inline T& Field(const void* base, int off) {
@@ -38,15 +53,18 @@ inline T& Field(const void* base, int off) {
 // ---- calling helpers ----
 template <uintptr_t A, typename R = void, typename... Args>
 inline R Call(Args... args) {
-    return reinterpret_cast<R(__cdecl*)(Args...)>(A)(args...);
+    uintptr_t at = version::Resolve(A);
+    return reinterpret_cast<R(__cdecl*)(Args...)>(at ? at : A)(args...);
 }
 template <uintptr_t A, typename R = void, typename C, typename... Args>
 inline R CallMethod(C* self, Args... args) {
-    return reinterpret_cast<R(__thiscall*)(C*, Args...)>(A)(self, args...);
+    uintptr_t at = version::Resolve(A);
+    return reinterpret_cast<R(__thiscall*)(C*, Args...)>(at ? at : A)(self, args...);
 }
 template <uintptr_t A, typename R = void, typename... Args>
 inline R CallStd(Args... args) {
-    return reinterpret_cast<R(__stdcall*)(Args...)>(A)(args...);
+    uintptr_t at = version::Resolve(A);
+    return reinterpret_cast<R(__stdcall*)(Args...)>(at ? at : A)(args...);
 }
 template <int Index, typename R = void, typename C, typename... Args>
 inline R CallVirtual(C* self, Args... args) {
