@@ -29,6 +29,65 @@ foreach ($m in [regex]::Matches((Get-Content $addrFile -Raw),
     $entryNames[$v] = $m.Groups[1].Value
 }
 
+# A literal inside a comment is documentation, not a dependency: the client never reads it, so it must
+# not be counted as an uncovered 1.0 address. Strip // and /* */ before scanning, keeping the column
+# layout so reported lines still line up.
+function Remove-Comments($lines) {
+    $out = New-Object string[] $lines.Count
+    $inBlock = $false
+    for ($i = 0; $i -lt $lines.Count; $i++) {
+        $line = $lines[$i]
+        $sb = New-Object System.Text.StringBuilder
+        $inString = $false
+        $quote = [char]0
+        $j = 0
+        while ($j -lt $line.Length) {
+            $c = $line[$j]
+            if ($inBlock) {
+                if ($c -eq '*' -and $j + 1 -lt $line.Length -and $line[$j + 1] -eq '/') {
+                    $inBlock = $false
+                    [void]$sb.Append('  ')
+                    $j += 2
+                    continue
+                }
+                [void]$sb.Append(' ')
+                $j++
+                continue
+            }
+            if ($inString) {
+                [void]$sb.Append($c)
+                if ($c -eq '\') {
+                    if ($j + 1 -lt $line.Length) { [void]$sb.Append($line[$j + 1]); $j += 2; continue }
+                } elseif ($c -eq $quote) {
+                    $inString = $false
+                }
+                $j++
+                continue
+            }
+            if ($c -eq '"' -or $c -eq "'") {
+                $inString = $true
+                $quote = $c
+                [void]$sb.Append($c)
+                $j++
+                continue
+            }
+            if ($c -eq '/' -and $j + 1 -lt $line.Length) {
+                if ($line[$j + 1] -eq '/') { break }
+                if ($line[$j + 1] -eq '*') {
+                    $inBlock = $true
+                    [void]$sb.Append('  ')
+                    $j += 2
+                    continue
+                }
+            }
+            [void]$sb.Append($c)
+            $j++
+        }
+        $out[$i] = $sb.ToString()
+    }
+    return $out
+}
+
 $sites = @()
 foreach ($dir in @("src/client", "src/common")) {
     Get-ChildItem -Recurse -File (Join-Path $root $dir) |
@@ -38,7 +97,8 @@ foreach ($dir in @("src/client", "src/common")) {
         } |
         ForEach-Object {
             $lineNo = 0
-            foreach ($line in Get-Content $_.FullName) {
+            $code = Remove-Comments @(Get-Content $_.FullName)
+            foreach ($line in $code) {
                 $lineNo++
                 foreach ($m in [regex]::Matches($line, '0x([0-9A-Fa-f]{6,8})')) {
                     $v = [Convert]::ToUInt32($m.Groups[1].Value, 16)
