@@ -105,7 +105,10 @@ def main():
     )
     start = text.index("constexpr Entry kEntries[] = {")
     end = text.index("};", start) + 2
-    updated = text[:start] + block + text[end:]
+    # Consume the blank lines that follow the array, otherwise every run leaves one more behind.
+    while end < len(text) and text[end] in "\r\n":
+        end += 1
+    updated = text[:start] + block + "\n\n" + text[end:]
 
     print(f"existing {before}, added {added}, total {len(rows)}, conflicts {conflicts}")
     if args.apply:

@@ -467,7 +467,8 @@ def translate(model, f10, v30, target):
                 # can silently pick a different call in a function with many calls.
                 i10 = t10[idx][2]
                 if i10.mnemonic == "call" and ins30.mnemonic == "call":
-                    c10, c30 = direct_call(i10), direct_call(ins30)
+                    c10 = direct_call(i10)
+                    c30 = call_target(ins30)
                     known = SET_SEEDS.get(c10)
                     if c10 and c30 and known and known == c30:
                         return "code", a30, True
@@ -478,7 +479,22 @@ def translate(model, f10, v30, target):
             if ref and is_data30(ref):
                 return "data", ref, True
             return None, 0, False
+
+    # A call site the alignment lost stays lost: the two rules that could guess it (the single
+    # call to the mapped callee, the order of the calls around it) each got one confirmed site
+    # wrong out of a few dozen, and a wrong patch site is worse than a missing one.
     return None, 0, False
+
+
+def call_target(insn, hi=0x8A4000):
+    """Direct call target of a 3.0 instruction, or 0."""
+    if insn.mnemonic in ("call", "jmp") and insn.operands:
+        op = insn.operands[0]
+        if op.type == X86_OP_IMM:
+            v = op.imm & 0xFFFFFFFF
+            if 0x401000 <= v < hi:
+                return v
+    return 0
 
 
 def direct_call(insn):
