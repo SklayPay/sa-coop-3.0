@@ -61,10 +61,12 @@ def main():
 
     added = 0
     conflicts = 0
+    seen = set()
     for r in csv.DictReader(open(MAPPING, encoding="utf-8-sig")):
         if r["state"] != "confirmed" or not r["v30"]:
             continue
         v10, v30 = int(r["v10"], 16), int(r["v30"], 16)
+        seen.add(v10)
         if v10 in entries:
             if entries[v10]["v30"] not in (0, v30):
                 # A hand-written byte pattern is authoritative; an auto-generated row is not,
@@ -84,6 +86,14 @@ def main():
             "kind": "Direct",
         }
         added += 1
+
+    # An entry that the mapping no longer confirms (or no longer lists at all - the inventory
+    # dropped the address, for instance because it only ever appeared in a comment) must go, or
+    # the table would keep an address the pipeline has since withdrawn. Rows with a hand-written
+    # byte pattern are the exception: they were added by hand and the mapping is not their source.
+    dropped = sorted(v for v, e in entries.items() if e["pattern"] == "{}" and v not in seen)
+    for v in dropped:
+        del entries[v]
 
     rows = []
     for e in sorted(entries.values(), key=lambda x: x["v10"]):
@@ -110,7 +120,10 @@ def main():
         end += 1
     updated = text[:start] + block + "\n\n" + text[end:]
 
-    print(f"existing {before}, added {added}, total {len(rows)}, conflicts {conflicts}")
+    print(f"existing {before}, added {added}, dropped {len(dropped)}, "
+          f"total {len(rows)}, conflicts {conflicts}")
+    if dropped:
+        print("dropped: " + ", ".join(f"0x{v:08X}" for v in dropped))
     if args.apply:
         SOURCE.write_text(updated, encoding="utf-8")
         print(f"written {SOURCE}")

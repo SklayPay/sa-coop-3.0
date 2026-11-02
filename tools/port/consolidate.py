@@ -55,6 +55,25 @@ KNOWN = {
 
 SET_SEEDS = {}
 
+# What each source actually measures. Different matchers that share a metric are one signal, not
+# two: match_ghidra.py and match_functions.py both score a function by
+# 0.85 * SequenceMatcher(token sequences) + 0.15 * length ratio and differ only in where they
+# take the function boundaries from (Ghidra's analysis or radare2's). Running the same comparison
+# under two segmentations does not make it independent evidence, so all of them count as `shape`.
+SOURCE_KIND = {
+    "ghidra": "vt",             # Ghidra Version Tracking proposal
+    "ghidra-bounds": "shape",   # token matcher over Ghidra's function boundaries
+    "insns": "shape",           # token matcher over radare2's function boundaries
+    "body-insns": "shape",      # the same metric searched over the whole function list
+    "features": "features",     # string and import matcher
+    "calls": "propagate",       # call-graph propagation from a matched caller
+    "xref-ver": "refs",         # anchored references and callers
+    "delta-nb": "delta",        # distance to a confirmed neighbour
+    "xref": "operand",          # the operand of an aligned instruction
+    "manual": "manual",
+    "known": "manual",
+}
+
 
 def in_game(v):
     v &= 0xFFFFFFFF
@@ -572,15 +591,24 @@ def main():
                     row["kind"] = kind
                     row["v30"] = f"0x{addr:08X}"
                     src = sources.get(addr10(f), [])
-                    conf = [s for s, q in src if q >= 0.9]
-                    manual = any(s == "manual" for s, _ in src)
-                    verified = any(s == "xref-ver" for s, _ in src)
+                    kinds = {SOURCE_KIND.get(s, s) for s, q in src if q >= 0.9}
+                    manual = bool(kinds & {"manual"})
+                    verified = "refs" in kinds and any(s == "xref-ver" for s, _ in src)
                     conflict = any(s.startswith("conflict") for s, _ in src)
+                    # The near-exact body rule is accepted on its own: it means the two bodies are
+                    # the same instruction sequence, which is stronger than counting sources.
+                    exact = any(s == "body-insns" for s, _ in src)
                     # Conflicting evidence must never yield a confirmed row on its own; a
                     # reviewed manual seed or a cross-verified function pair is allowed to
                     # override the conflict.
                     strong = strong and (verified or manual or not conflict)
-                    row["state"] = "confirmed" if (verified or (strong and (len(conf) >= 2 or manual))) else "single"
+                    # Two signals means two different ways of measuring, not the same matcher run
+                    # twice: match_ghidra.py and match_functions.py share the token metric and
+                    # differ only in where they take the function boundaries from. A reviewed
+                    # pair and the near-exact body rule still have to land on an aligned site.
+                    row["state"] = ("confirmed"
+                                    if (verified or (strong and (manual or len(kinds) >= 2 or exact)))
+                                    else "single")
                     row["sources"] = "+".join(sorted({s for s, _ in src}))
         if not row["v30"] and target >= 0x8A4000:
             # data target: find a code reference in 1.0 and translate the operand
