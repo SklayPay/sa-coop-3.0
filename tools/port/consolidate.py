@@ -107,16 +107,19 @@ class Model:
         self.starts30 = sorted(self.f30)
         self._cache = {}
         self._refs = None
+        self._ct = None
 
     def refs(self):
         """All absolute data references in 1.0 .text, keyed by the referenced address.
 
         Only instruction operands are used: scanning raw 4-byte windows finds bytes inside
-        instructions and reports nonsense targets.
+        instructions and reports nonsense targets. The same pass collects the targets of every
+        direct call and jump, which is what tells a function entry from a site inside one.
         """
         if self._refs is not None:
             return self._refs
         refs = defaultdict(list)
+        code_targets = set()
         self.md.skipdata = True
         for name, start, end, data in self.p10.sections:
             if name not in (".text", ".HOODLUM"):
@@ -124,7 +127,12 @@ class Model:
             for insn in self.md.disasm(data, start):
                 if insn.id == 0:
                     continue
-                if insn.mnemonic in ("call", "jmp") or insn.mnemonic.startswith("j"):
+                if insn.mnemonic in ("call", "jmp"):
+                    op = insn.operands[0] if insn.operands else None
+                    if op is not None and op.type == X86_OP_IMM:
+                        code_targets.add(op.imm & 0xFFFFFFFF)
+                    continue
+                if insn.mnemonic.startswith("j"):
                     continue
                 for op in insn.operands:
                     if op.type == X86_OP_MEM and op.mem.base == 0 and op.mem.index == 0 and op.mem.disp:
@@ -136,7 +144,14 @@ class Model:
                         if in_game(v) and not is_code10(v):
                             refs[v].append(insn.address)
         self._refs = refs
+        self._ct = code_targets
         return refs
+
+    def code_targets(self):
+        """Every address a direct call or jump in 1.0 .text points at."""
+        if self._refs is None:
+            self.refs()
+        return self._ct
 
     def refs_items(self, target):
         """Yield (referenced_address, function_start, instruction_site) for a data target.
@@ -173,6 +188,90 @@ class Model:
                 out.append((insn.address, t, insn))
         self._cache[key] = out
         return out
+
+
+def body_of(model, va):
+    """Real body of a 1.0 address, following a HOODLUM trampoline chain. Returns (body, chain).
+
+    The crack that shipped with 1.0 US moved a few functions into the section it appended and
+    left a five byte `jmp` behind. The inventory calls the trampoline, but only the body it
+    points at carries the instructions that can be matched against 3.0.
+    """
+    chain = []
+    for _ in range(8):
+        b = model.p10.read(va, 5)
+        if b and b[0] == 0xE9:
+            rel = struct.unpack_from("<i", b, 1)[0]
+            nxt = (va + 5 + rel) & 0xFFFFFFFF
+            if is_code10(nxt) and nxt != va:
+                chain.append(nxt)
+                va = nxt
+                continue
+        break
+    return va, chain
+
+
+def body_end(model, which, start, cap=0x1000):
+    """End of a function body Ghidra did not bound: stop at the padding after a return."""
+    pe = model.p10 if which == 10 else model.p30
+    starts = model.starts10 if which == 10 else model.starts30
+    limit = 0x857000 if which == 10 else 0x8A4000
+    k = bisect.bisect_right(starts, start)
+    end = min(start + cap, limit)
+    if k < len(starts):
+        end = min(end, starts[k])
+    md = model.md
+    md.skipdata = True
+    last = start
+    for insn in md.disasm(pe.read(start, end - start), start):
+        if insn.id == 0:
+            break
+        last = insn.address + insn.size
+        if insn.mnemonic in ("ret", "retf", "int3", "ud2"):
+            pad = pe.read(last, 8)
+            if pad and all(x in (0x90, 0xCC) for x in pad):
+                return last
+        if last >= end:
+            break
+    return last
+
+
+def body_size(model, which, start):
+    """Size of the body at a start: Ghidra's when it described one, guessed otherwise."""
+    funcs = model.f10 if which == 10 else model.f30
+    if start in funcs:
+        size = int(funcs[start]["size"])
+        if size >= 0x10:
+            return size
+    return body_end(model, which, start) - start
+
+
+def plausible_entry(model, va):
+    """Whether an address Ghidra did not describe can be the entry of a function.
+
+    Ghidra leaves out small leaf functions and virtual methods, so the inventory sometimes names
+    a start it never listed. A redirect site in the middle of a function must not be mistaken for
+    one: those hold a call instruction, and decoding from there yields the tail of the function
+    they live in, which happily matches some unrelated 3.0 body.
+    """
+    if va in model.f10:
+        return True
+    insns = model.insns(10, va, 16)
+    if not insns:
+        return False
+    mnemonic = insns[0][2].mnemonic
+    if mnemonic == "jmp":
+        return True          # a HOODLUM trampoline; body_of follows it
+    if mnemonic in ("call", "ret", "retf", "int3", "ud2"):
+        return False
+    if va in model.code_targets():
+        return True
+    tail = model.p10.read(va - 4, 4)
+    if tail and (tail[3] in (0x90, 0xCC, 0xC3, 0xCB) or tail[2] == 0xC2):
+        return True          # right after the previous function's padding or return
+    head = model.p10.read(va, 4)
+    return (head[:3] in (b"\x55\x8b\xec", b"\x6a\xff", b"\x64\xa1", b"\x8b\xff")
+            or head[:2] in (b"\x83\xec", b"\x81\xec", b"\x51\x8b", b"\x56\x8b", b"\x57\x8b"))
 
 
 def ghirda_functions():
@@ -278,6 +377,30 @@ def build_seeds(model, ghidra, include_propagated=True):
                 continue
             seeds[v10] = v30
             sources.setdefault(v10, []).append(("xref-ver", 1.0))
+    # Bodies of addresses no other matcher can see: 1.0 function starts Ghidra did not describe
+    # and HOODLUM trampolines whose body lives in the section the crack appended. match_missing.py
+    # matched them by instruction shape, which is a weak signal on its own, so only a near-exact
+    # sequence counts here - the same standard the `insns` source uses, raised because these
+    # bodies are short and a single wrong instruction matters.
+    path = ROOT / "docs/port/missing_candidates.csv"
+    if path.exists():
+        by10 = defaultdict(list)
+        for r in csv.DictReader(open(path, encoding="utf-8-sig")):
+            by10[int(r["v10"], 16)].append(
+                (float(r["score"]), float(r["lenratio"]), int(r["v30"], 16)))
+        for v10, cand in by10.items():
+            cand.sort(reverse=True)
+            score, lr, v30 = cand[0]
+            second = cand[1][0] if len(cand) > 1 else 0.0
+            if score < 0.95 or score - second < 0.15 or lr < 0.9:
+                continue
+            if not (is_code10(v10) and 0x401000 <= v30 < 0x8A4000):
+                continue
+            if v10 in seeds and seeds[v10] != v30:
+                sources.setdefault(v10, []).append(("conflict-body", score))
+                continue
+            seeds[v10] = v30
+            sources.setdefault(v10, []).append(("body-insns", 1.0))
     # Hand-checked pairs: call-graph fingerprints, masked byte patterns and 1.0 HOODLUM
     # trampolines whose body was identified by disassembly. They are kept in the repository so
     # the pipeline can be reproduced without the temporary matcher output.
@@ -404,6 +527,22 @@ def main():
             row["v30"] = f"0x{direct:08X}"
             row["state"] = "confirmed"
             row["sources"] = "manual"
+            stats[row["state"]] += 1
+            rows.append(row)
+            continue
+        if direct and is_code10(target) and target not in model.f10 \
+                and model.owner10(target) is None and plausible_entry(model, target):
+            # A function start Ghidra did not describe, mapped by the body matcher or by the
+            # cross-reference check. The address is the entry point itself, so it maps the way a
+            # function does; the state still comes from the strength of its sources.
+            src = sources.get(target, [])
+            conf = [s for s, q in src if q >= 0.9]
+            verified = any(s == "xref-ver" for s, _ in src)
+            conflict = any(s.startswith("conflict") for s, _ in src)
+            row["kind"] = "func"
+            row["v30"] = f"0x{direct:08X}"
+            row["state"] = "confirmed" if (verified or (conf and not conflict)) else "single"
+            row["sources"] = "+".join(sorted({s for s, _ in src}))
             stats[row["state"]] += 1
             rows.append(row)
             continue
