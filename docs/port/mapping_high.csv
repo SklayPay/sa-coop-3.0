@@ -117,6 +117,7 @@ v10,v30,state,kind,function10,function30,sources,refs,first,name
 0x4341C0,0x00437150,confirmed,func,0x004341C0,,manual,1,src/client/features/population/Population.cpp:334,src/client/features/population/Population.cpp:334
 0x437C20,0x0043AE60,confirmed,func,0x00437C20,,manual,1,src/client/entities/vehicle/Vehicles.cpp:144,src/client/entities/vehicle/Vehicles.cpp:144
 0x438565,0x0043B7EA,confirmed,code,0x00438480,0x0043B6F0,ghidra+xref-ver,1,src/client/features/cheats/Cheats.cpp:80,
+0x43E983,0x00442174,confirmed,code,0x0043E8B0,0x00442090,ghidra+xref-ver,1,src/client/features/population/Population.cpp:324,
 0x4407B7,0x0044412A,confirmed,code,0x004404A0,0x00443E20,ghidra+xref-ver,1,src/client/features/population/Population.cpp:326,
 0x441390,0x00444D70,confirmed,func,0x00441390,,manual,1,src/client/app/patches/Patches.cpp:702,src/client/app/patches/Patches.cpp:702
 0x4414C0,0x00444EC0,confirmed,func,0x004414C0,0x00444EC0,ghidra+xref-ver,1,src/client/features/time-weather/World.cpp:58,
@@ -147,6 +148,7 @@ v10,v30,state,kind,function10,function30,sources,refs,first,name
 0x46B73D,0x00471334,confirmed,code,0x0046B460,0x00471080,ghidra+xref-ver,1,src/client/features/story/missions/Missions.cpp:3287,
 0x485E00,0x0048C3D0,confirmed,func,0x00485E00,,manual,1,src/client/features/story/missions/Missions.cpp:3267,src/client/features/story/missions/Missions.cpp:3267
 0x486B00,0x0048D0F0,confirmed,func,0x00486B00,0x0048D0F0,ghidra+xref-ver,1,src/client/app/patches/Patches.cpp:750,
+0x49CEC0,0x004A48C0,confirmed,func,0x0049CEC0,0x004A48C0,ghidra+xref-ver,1,src/client/features/pickups/Pickups.cpp:121,
 0x4AB420,0x004B4AA0,confirmed,func,0x004AB420,0x004B4AA0,ghidra+xref-ver,1,src/client/features/mission-objects/Objects.cpp:84,
 0x4B0A00,0x004BA180,confirmed,func,0x004B0A00,0x004BA180,ghidra+ghidra-bounds+insns,1,src/client/features/mission-objects/Objects.cpp:83,src/client/features/mission-objects/Objects.cpp:83
 0x4B27D0,0x004BBF90,confirmed,func,0x004B27D0,0x004BBF90,ghidra+ghidra-bounds,1,src/client/features/damage/Damage.cpp:431,src/client/features/damage/Damage.cpp:431
@@ -160,6 +162,8 @@ v10,v30,state,kind,function10,function30,sources,refs,first,name
 0x4D4410,0x004DEDD0,confirmed,func,0x004D4410,,manual,1,src/client/shared/game/Anim.h:64,src/client/shared/game/Anim.h:64
 0x4D4610,0x004DF050,confirmed,func,0x004D4610,0x004DF050,calls+xref-ver,4,src/client/entities/ped/Peds.cpp:1276,
 0x4D47F0,0x004DF270,confirmed,func,0x004D47F0,0x004DF270,calls+xref-ver,1,src/client/features/story/cutscene-clips/SceneMocap.cpp:369,
+0x4D5E80,0x004E08B0,confirmed,func,0x004D5E80,0x004E08B0,ghidra-bounds+xref-ver,1,src/client/features/story/missions/Missions.cpp:3271,
+0x4D5EA3,0x004E08D3,confirmed,code,0x004D5E80,0x004E08B0,ghidra-bounds+xref-ver,1,src/client/features/story/missions/Missions.cpp:3273,
 0x4D6720,0x004E1630,confirmed,func,0x004D6720,0x004E1630,ghidra+ghidra-bounds,1,src/client/features/props/Props.cpp:469,src/client/features/props/Props.cpp:469
 0x4D6870,0x004E1020,confirmed,func,0x004D6870,0x004E1020,ghidra-bounds+insns,2,src/client/features/story/cutscene-partner/ScenePartner.cpp:1807,src/client/features/story/cutscene-partner/ScenePartner.cpp:1807
 0x4D6AB0,0x004E12A0,confirmed,func,0x004D6AB0,0x004E12A0,ghidra+ghidra-bounds+insns,1,src/client/shared/game/Anim.h:19,src/client/shared/game/Anim.h:19
@@ -188,6 +192,7 @@ v10,v30,state,kind,function10,function30,sources,refs,first,name
 0x534540,0x00545DA0,confirmed,func,0x00534540,0x00545DA0,calls+xref-ver,5,src/client/entities/ped/Peds.cpp:627,
 0x535300,0x00546D60,confirmed,func,0x00535300,0x00546D60,ghidra+ghidra-bounds+insns+xref-ver,1,src/client/app/patches/Patches.cpp:604,src/client/app/patches/Patches.cpp:604
 0x536BE0,0x00548B50,confirmed,func,0x00536BE0,0x00548B50,ghidra+ghidra-bounds+insns,1,src/client/features/story/cutscene-partner/ScenePartner.cpp:2007,src/client/features/story/cutscene-partner/ScenePartner.cpp:2007
+0x539360,0x0054B110,confirmed,func,0x00539360,0x0054B110,features+ghidra+xref-ver,1,src/client/features/fire/Fire.cpp:155,
 0x5393F0,0x0054B1A0,confirmed,func,0x005393F0,0x0054B1A0,ghidra+ghidra-bounds+insns,3,src/client/features/fire/Fire.cpp:176,src/client/features/fire/Fire.cpp:176
 0x53BEE6,0x0054DE66,confirmed,code,0x0053BEE0,0x0054DE60,ghidra+xref-ver,1,src/client/app/patches/Patches.cpp:719,
 0x53C550,0x0054E600,confirmed,func,0x0053C550,0x0054E600,ghidra+ghidra-bounds+xref-ver,1,src/client/app/core/Core.cpp:638,
@@ -240,6 +245,7 @@ v10,v30,state,kind,function10,function30,sources,refs,first,name
 0x5D3165,0x005EF8C5,confirmed,code,0x005D3160,0x005EF8C0,manual,1,src/client/features/garages/Garages.cpp:328,src/client/features/garages/Garages.cpp:328
 0x5DF100,0x005FBE10,confirmed,func,0x005DF100,0x005FBE10,calls+xref-ver,5,src/client/entities/ped/Peds.cpp:627,
 0x5E06E0,0x005FD0E0,confirmed,func,0x005E06E0,0x005FD0E0,ghidra+ghidra-bounds+insns,1,src/client/entities/ped/Peds.cpp:902,src/client/entities/ped/Peds.cpp:902
+0x5E5ED0,0x00603300,confirmed,func,0x005E5ED0,0x00603300,features+ghidra+xref-ver,2,src/client/entities/player/Players.cpp:226,
 0x5E6280,0x006036E0,confirmed,func,0x005E6280,0x006036E0,ghidra+ghidra-bounds+insns,1,src/client/entities/player/Players.cpp:1072,src/client/entities/player/Players.cpp:1072
 0x5F0360,0x0060F040,confirmed,func,0x005F0360,0x0060F040,ghidra+xref-ver,1,src/client/features/damage/Damage.cpp:427,
 0x6010A0,0x00620E00,confirmed,func,0x006010A0,0x00620E00,ghidra-bounds+insns,1,src/client/entities/ped/Peds.cpp:1088,src/client/entities/ped/Peds.cpp:1088

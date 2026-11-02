@@ -10,7 +10,7 @@
 Что сделано:
 
 - определение версии `gta_sa.exe` — `src/client/shared/game/version/GameVersion.cpp`;
-- все версионные адреса — `src/client/shared/game/version/Addresses.cpp` (343 записи);
+- все версионные адреса — `src/client/shared/game/version/Addresses.cpp` (349 записей);
 - `game::version::Resolve` переводит адрес 1.0 в адрес текущей версии; на 1.0 US это
   тождественная операция, поэтому поведение 1.0 не меняется;
 - `game::Ref`, `Call`, `CallMethod`, `CallStd`, `Ref10`, `Call10`, `Ptr10` используют `Resolve`;
@@ -79,8 +79,8 @@ Steam-враппером):
    функций по выравниванию инструкций и помечает состояние.
 5. Ручные проверенные пары из `docs/port/manual_seeds.csv` имеют приоритет.
 6. `verify_xref.py` независимо перепроверяет кандидатов по множествам вызываемых функций,
-   глобальных переменных и вызывающих, опираясь только на уже подтверждённые пары; результат —
-   `docs/port/xref_verified.csv`.
+   глобальных переменных, вызывающих и строковых литералов, опираясь только на уже
+   подтверждённые пары; результат — `docs/port/xref_verified.csv`.
 7. `gen_addresses.py` переносит в `Addresses.cpp` только `confirmed`.
 8. `validate_mapping.py` проверяет, что каждая запись попадает в правильную секцию и (для
    функций) в реальное начало функции 3.0.
@@ -115,8 +115,8 @@ uv run --with capstone --with pefile --python 3.12 python tools/port/validate_ma
 
 | Состояние | Всего | func | data | code |
 |---|---|---|---|---|
-| `confirmed` | 335 | 147 | 136 | 52 |
-| `single` | 129 | — | — | — |
+| `confirmed` | 341 | 151 | 136 | 54 |
+| `single` | 123 | — | — | — |
 | `missing` | 43 | — | — | — |
 
 `single` в `Addresses.cpp` не попадает: на 3.0 такой адрес не пропатчится (в лог уйдёт
@@ -124,7 +124,7 @@ uv run --with capstone --with pefile --python 3.12 python tools/port/validate_ma
 
 ## Что должно быть покрыто до включения 3.0
 
-- все 507 адресов должны быть `confirmed` (сейчас 335);
+- все 507 адресов должны быть `confirmed` (сейчас 341);
 - проверить ABI и смещения структур (`CPed`, `CVehicle`, `CPad`, `CPlayerInfo`, пулы, камера):
   на 3.0 часть layout'ов сдвинута (например, `CTimer`);
 - проверить script-переменные и миссии: в 3.0 может быть другой `main.scm`;

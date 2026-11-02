@@ -114,6 +114,48 @@ def score_pair(model, tables, ref10, refsize, v30):
     return (len(want_c & have_c), len(want_c), len(want_d & have_d), len(want_d))
 
 
+def printable_at(model, which, va, n=40):
+    """The NUL-terminated printable string at an address, or None.
+
+    The length floor keeps single characters and stray literals out; a NUL inside the window is
+    required, otherwise the bytes are a table or code, not text.
+    """
+    pe = model.p10 if which == 10 else model.p30
+    b = pe.read(va, n)
+    if not b:
+        return None
+    out = bytearray()
+    for ch in b:
+        if ch == 0:
+            break
+        if not (0x20 <= ch < 0x7F):
+            return None
+        out.append(ch)
+    return bytes(out) if len(out) >= 6 else None
+
+
+def string_sets(model, which, start, size):
+    """Printable strings a body refers to, content -> the address holding them.
+
+    A string literal is the one piece of a function that survives recompilation byte for byte, so
+    agreement on it does not come from anything this tool has already mapped. That makes it the
+    only signal available to a body that calls nothing mapped and touches no mapped global.
+    """
+    _, data = reference_sets_at(model, which, start, size)
+    out = {}
+    for a in sorted(data):
+        s = printable_at(model, which, a)
+        if s is not None and s not in out:
+            out[s] = a
+    return out
+
+
+def strings_pass(s):
+    """(hit, total) of the string literals both bodies name. Every one of them must match."""
+    hit, total = s
+    return total >= 1 and hit == total
+
+
 def score(model, tables, f10, v30):
     """score_pair for a described 1.0 function; None when it is not one."""
     if f10 not in model.f10:
@@ -264,21 +306,33 @@ def main():
     C.SET_SEEDS = dict(tables[0])
     maps = call_graphs(model)
     good, ambiguous = [], []
+
+    def string_score(names10, d):
+        """(shared, total) string literals of the two bodies."""
+        if not names10:
+            return 0, 0
+        names30 = string_sets(model, 30, d, int(model.f30[d]["size"]))
+        return sum(1 for x in names10 if x in names30), len(names10)
+
     for r, entry, ref, refsize, v30, alts in rows:
         s = score_pair(model, tables, ref, refsize, v30)
         cs = caller_score(tables, maps, entry, v30)
+        names10 = string_sets(model, 10, ref, refsize)
+        ss = string_score(names10, v30)
         ok_ref = passes(s)
         ok_caller = callers_pass(cs)
-        if not (ok_ref or ok_caller):
+        ok_str = strings_pass(ss)
+        if not (ok_ref or ok_caller or ok_str):
             continue
         same = [d for d in alts
                 if d != v30 and d in model.f30
                 and (passes(score_pair(model, tables, ref, refsize, d))
-                     or callers_pass(caller_score(tables, maps, entry, d)))]
+                     or callers_pass(caller_score(tables, maps, entry, d))
+                     or strings_pass(string_score(names10, d)))]
         if same:
             ambiguous.append((r, entry, v30, same))
             continue
-        good.append((r, entry, v30, s, cs, ok_ref, ok_caller))
+        good.append((r, entry, v30, s, cs, ss, ok_ref, ok_caller, ok_str))
 
     print(f"verified: {len(good)}   rejected as ambiguous: {len(ambiguous)}")
     for r, entry, v30, same in ambiguous:
@@ -288,27 +342,32 @@ def main():
     # The evidence attaches to the function pair, so every row inside that function benefits
     # from it. Rows that verified the pair are listed for the audit trail.
     merged = {}
-    for r, entry, v30, s, cs, ok_ref, ok_caller in good:
-        e = merged.setdefault((entry, v30), {"rows": [], "s": s, "cs": cs,
-                                             "ref": ok_ref, "caller": ok_caller})
+    for r, entry, v30, s, cs, ss, ok_ref, ok_caller, ok_str in good:
+        e = merged.setdefault((entry, v30), {"rows": [], "s": s, "cs": cs, "ss": ss,
+                                             "ref": ok_ref, "caller": ok_caller,
+                                             "str": ok_str})
         e["rows"].append(int(r["v10"], 16))
         # keep the strongest agreement seen for the pair
         if (s[1], s[0], s[3], s[2]) > (e["s"][1], e["s"][0], e["s"][3], e["s"][2]):
             e["s"] = s
         if cs > e["cs"]:
             e["cs"] = cs
+        if ss[1] > e["ss"][1]:
+            e["ss"] = ss
 
     with open(OUT, "w", newline="", encoding="utf-8") as fp:
         w = csv.writer(fp)
         w.writerow(["v10", "v30", "callees", "callees_hit", "globals", "globals_hit",
                     "callers", "callers_hit", "rows", "evidence"])
         for (entry, v30), e in sorted(merged.items()):
-            s, cs = e["s"], e["cs"]
+            s, cs, ss = e["s"], e["cs"], e["ss"]
             parts = []
             if e["ref"]:
                 parts.append(f"anchored callees {s[0]}/{s[1]}, globals {s[2]}/{s[3]}")
             if e["caller"]:
                 parts.append(f"anchored callers {cs[0]}/{cs[1]}")
+            if e["str"]:
+                parts.append(f"string literals {ss[0]}/{ss[1]}")
             w.writerow([f"0x{entry:08X}", f"0x{v30:08X}", s[1], s[0], s[3], s[2],
                         cs[1], cs[0],
                         " ".join(f"0x{x:08X}" for x in sorted(e["rows"])),
