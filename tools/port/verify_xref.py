@@ -68,7 +68,28 @@ def anchor_table(model):
         elif r["kind"] == "data":
             fwd_d[v10] = v30
             val_d.add(v30)
+    add_exact_pairs(model, fwd_c, rev_c)
     return fwd_c, fwd_d, rev_c, val_d
+
+
+def add_exact_pairs(model, fwd_c, rev_c):
+    """Add the function pairs Version Tracking reports as an exact match.
+
+    The rows above are the inventory, 507 addresses the mod uses. Everything else in the image is
+    an unknown, which leaves these two axes with 142 anchors to work with, and a function whose
+    callees are not among them cannot be checked at all. Version Tracking's exact sets cover the
+    whole image and state that the two bodies are the same code - the one kind of evidence the
+    mapping accepts on its own (`ghidra-exact`) - so they are usable as anchors even though the mod
+    never mentions those functions. A pair that contradicts a confirmed row is refused and
+    reported, since one of the two is then wrong.
+    """
+    conflicts = 0
+    for v10, v30 in C.ghidra_exact().items():
+        if v10 not in model.f10 or v30 not in model.f30:
+            continue
+        if fwd_c.setdefault(v10, v30) != v30 or rev_c.setdefault(v30, v10) != v10:
+            conflicts += 1
+    print(f"exact-match anchors added, {conflicts} contradicting a confirmed pair")
 
 
 def reference_sets_at(model, which, start, size):

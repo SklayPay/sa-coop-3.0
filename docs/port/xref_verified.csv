@@ -1,74 +1,106 @@
 v10,v30,callees,callees_hit,globals,globals_hit,callers,callers_hit,rows,evidence
-0x004087E0,0x00408920,1,1,0,0,4,4,0x004087E0,anchored callers 4/4
-0x00409D10,0x00409F70,3,3,4,4,0,0,0x00409D10,"anchored callees 3/3, globals 4/4; string literals 1/1"
-0x00430050,0x00432AA0,5,5,4,4,1,1,0x00430455,"anchored callees 5/5, globals 4/4"
+0x004087E0,0x00408920,1,1,0,0,11,11,0x004087E0,anchored callers 11/11
+0x00409C10,0x00409E90,0,0,0,0,4,4,0x00409C10,anchored callers 4/4
+0x00409D10,0x00409F70,6,6,4,4,0,0,0x00409D10,"anchored callees 6/6, globals 4/4; string literals 1/1"
+0x00430050,0x00432AA0,9,9,4,4,1,1,0x00430455,"anchored callees 9/9, globals 4/4"
 0x00438480,0x0043B6F0,3,3,3,3,0,0,0x00438565,"anchored callees 3/3, globals 3/3; string literals 2/2"
 0x0043E8B0,0x00442090,0,0,1,1,0,0,0x0043E983,string literals 4/4
-0x004404A0,0x00443E20,2,2,5,5,0,0,0x004407B7,"anchored callees 2/2, globals 5/5"
-0x004414C0,0x00444EC0,1,1,3,3,0,0,0x004414C0 0x00441534,"anchored callees 1/1, globals 3/3"
-0x00442060,0x00445C50,6,6,3,3,0,0,0x00442060,"anchored callees 6/6, globals 3/3"
+0x004404A0,0x00443E20,7,7,5,5,0,0,0x004407B7,"anchored callees 7/7, globals 5/5"
+0x004414C0,0x00444EC0,2,2,3,3,0,0,0x004414C0 0x00441534,"anchored callees 2/2, globals 3/3"
+0x00442060,0x00445C50,17,17,3,3,0,0,0x00442060,"anchored callees 17/17, globals 3/3"
 0x00446610,0x0044A4A0,3,3,13,13,0,0,0x004466DC 0x00446E46,"anchored callees 3/3, globals 13/13; string literals 7/7"
-0x0044AA50,0x0044EC60,9,9,6,6,0,0,0x0044BE44 0x0044C1E1,"anchored callees 9/9, globals 6/6"
-0x00456A70,0x0045BBE0,3,3,4,4,0,0,0x00456A70,"anchored callees 3/3, globals 4/4; string literals 2/2"
-0x00457410,0x0045C4A0,9,9,7,7,0,0,0x00457410,"anchored callees 9/9, globals 7/7; string literals 6/6"
-0x0046A000,0x0046F770,0,0,3,3,0,0,0x0046A21B,"anchored callees 0/0, globals 3/3"
-0x0046B460,0x00471080,4,4,8,8,0,0,0x0046B6ED 0x0046B715 0x0046B73D,"anchored callees 4/4, globals 8/8"
-0x00486B00,0x0048D0F0,5,5,0,0,1,1,0x00486B00,"anchored callees 5/5, globals 0/0"
-0x00496E00,0x0049E4D0,1,0,10,10,0,0,0x00498D54 0x00498D6A,"anchored callees 0/1, globals 10/10; string literals 1/1"
+0x0044AA50,0x0044EC60,13,13,6,6,0,0,0x0044BE44 0x0044C1E1,"anchored callees 13/13, globals 6/6"
+0x00456A70,0x0045BBE0,4,4,4,4,0,0,0x00456A70,"anchored callees 4/4, globals 4/4; string literals 2/2"
+0x00457410,0x0045C4A0,14,14,7,7,0,0,0x00457410,"anchored callees 14/14, globals 7/7; string literals 6/6"
+0x0046A000,0x0046F770,2,1,3,3,1,1,0x0046A21B,"anchored callees 1/2, globals 3/3"
+0x0046B460,0x00471080,21,21,8,8,0,0,0x0046B6ED 0x0046B715 0x0046B73D,"anchored callees 21/21, globals 8/8"
+0x00486B00,0x0048D0F0,7,7,0,0,1,1,0x00486B00,"anchored callees 7/7, globals 0/0"
+0x00496E00,0x0049E4D0,11,10,10,10,0,0,0x00498D54 0x00498D6A,"anchored callees 10/11, globals 10/10; string literals 1/1"
 0x0049CEC0,0x004A48C0,0,0,1,1,0,0,0x0049CEC0,string literals 2/2
-0x004AB420,0x004B4AA0,0,0,0,0,4,4,0x004AB420,anchored callers 4/4
+0x004AB420,0x004B4AA0,2,2,0,0,5,5,0x004AB420,anchored callers 5/5
 0x004B0A00,0x004BA180,0,0,0,0,2,2,0x004B0A00,anchored callers 2/2
 0x004B0A50,0x004BA1D0,0,0,0,0,2,2,0x004B0A50,anchored callers 2/2
 0x004B3440,0x004BCCA0,3,3,0,0,0,0,0x004B3440,"anchored callees 3/3, globals 0/0"
+0x004B4E80,0x004BE720,3,3,0,0,0,0,0x004B4E80,"anchored callees 3/3, globals 0/0"
 0x004B50B0,0x004BE980,3,3,0,0,0,0,0x004B50B0,"anchored callees 3/3, globals 0/0"
-0x004D4610,0x004DF050,0,0,2,2,5,5,0x004D4610,anchored callers 5/5
-0x004D47F0,0x004DF270,0,0,3,3,0,0,0x004D47F0,"anchored callees 0/0, globals 3/3"
+0x004B9340,0x004C27F0,3,3,1,1,0,0,0x004B9340,"anchored callees 3/3, globals 1/1"
+0x004CEA80,0x004D92A0,0,0,0,0,2,2,0x004CEA80,anchored callers 2/2
+0x004D3990,0x004DE2F0,0,0,1,1,3,3,0x004D3990,anchored callers 3/3
+0x004D4610,0x004DF050,0,0,2,2,6,6,0x004D4610,anchored callers 6/6
+0x004D47F0,0x004DF270,3,3,3,3,0,0,0x004D47F0,"anchored callees 3/3, globals 3/3"
 0x004D5E80,0x004E08B0,1,1,0,0,0,0,0x004D5E80 0x004D5EA3,string literals 1/1
-0x004E6550,0x004F1D90,1,1,3,3,0,0,0x004E6550,"anchored callees 1/1, globals 3/3"
-0x004EB9A0,0x004F75E0,2,2,4,4,0,0,0x004EB9F4,"anchored callees 2/2, globals 4/4"
-0x00532010,0x005437E0,3,3,2,2,3,3,0x00532010,"anchored callees 3/3, globals 2/2; anchored callers 3/3; string literals 1/1"
-0x00532B00,0x005442B0,0,0,0,0,2,2,0x00532B00,anchored callers 2/2
+0x004E6550,0x004F1D90,4,4,3,3,0,0,0x004E6550,"anchored callees 4/4, globals 3/3"
+0x004EB9A0,0x004F75E0,4,4,4,4,0,0,0x004EB9F4,"anchored callees 4/4, globals 4/4"
+0x00502280,0x0050F570,3,3,0,0,0,0,0x00502280,"anchored callees 3/3, globals 0/0"
+0x00532010,0x005437E0,5,5,2,2,4,4,0x00532010,"anchored callees 5/5, globals 2/2; anchored callers 4/4; string literals 1/1"
+0x00532B00,0x005442B0,1,1,0,0,2,2,0x00532B00,anchored callers 2/2
 0x00534540,0x00545DA0,0,0,1,1,2,2,0x00534540,anchored callers 2/2
 0x00535300,0x00546D60,0,0,0,0,2,2,0x00535300,anchored callers 2/2
-0x00539360,0x0054B110,0,0,0,0,0,0,0x00539360,string literals 2/2
-0x0053BEE0,0x0054DE60,3,3,6,6,0,0,0x0053BEE6,"anchored callees 3/3, globals 6/6"
-0x0053C550,0x0054E600,0,0,4,4,1,1,0x0053C550,"anchored callees 0/0, globals 4/4"
-0x0053C680,0x0054E730,1,1,4,4,0,0,0x0053C680,"anchored callees 1/1, globals 4/4; string literals 3/3"
-0x0053E770,0x00550F50,0,0,4,4,0,0,0x0053E7A5 0x0053E86C 0x0053E87D,"anchored callees 0/0, globals 4/4"
-0x0053E920,0x00551110,0,0,6,6,0,0,0x0053E981 0x0053E9F1 0x0053EBE4 0x0053EBF5,"anchored callees 0/0, globals 6/6"
+0x00539360,0x0054B110,1,1,0,0,2,2,0x00539360,anchored callers 2/2; string literals 2/2
+0x005393F0,0x0054B1A0,2,2,0,0,2,2,0x005393F0,anchored callers 2/2
+0x00539F00,0x0054BBC0,3,3,1,1,1,1,0x00539F00,"anchored callees 3/3, globals 1/1"
+0x0053A050,0x0054BD40,4,4,1,1,0,0,0x0053A050,"anchored callees 4/4, globals 1/1"
+0x0053BEE0,0x0054DE60,9,9,6,6,0,0,0x0053BEE6,"anchored callees 9/9, globals 6/6"
+0x0053C550,0x0054E600,4,4,4,4,1,1,0x0053C550,"anchored callees 4/4, globals 4/4"
+0x0053C680,0x0054E730,7,7,4,4,0,0,0x0053C680,"anchored callees 7/7, globals 4/4; string literals 3/3"
+0x0053E770,0x00550F50,4,4,4,4,0,0,0x0053E7A5 0x0053E86C 0x0053E87D,"anchored callees 4/4, globals 4/4"
+0x0053E920,0x00551110,6,5,6,6,0,0,0x0053E981 0x0053E9F1 0x0053EBE4 0x0053EBF5,"anchored callees 5/6, globals 6/6"
+0x0054D690,0x00561360,3,3,0,0,0,0,0x0054D690,"anchored callees 3/3, globals 0/0"
 0x00558E40,0x00571AF0,0,0,0,0,4,4,0x00558E40,anchored callers 4/4
-0x0055C180,0x00575050,1,1,1,1,5,5,0x0055C180,anchored callers 5/5
+0x0055C180,0x00575050,2,2,1,1,7,7,0x0055C180,anchored callers 7/7
 0x00562410,0x0057C360,0,0,0,0,4,4,0x00562410,anchored callers 4/4
 0x00563220,0x0057D310,1,1,0,0,2,2,0x00563220,anchored callers 2/2
 0x00563280,0x0057D370,0,0,0,0,8,8,0x00563280,anchored callers 8/8
-0x0056E0D0,0x005637C0,0,0,1,1,4,4,0x0056E0D0,anchored callers 4/4
-0x0056E230,0x00563920,0,0,1,1,4,4,0x0056E230,anchored callers 4/4
-0x00576B70,0x0058BF30,0,0,3,3,0,0,0x00576C55,"anchored callees 0/0, globals 3/3"
+0x0056E0D0,0x005637C0,0,0,1,1,9,9,0x0056E0D0,anchored callers 9/9
+0x0056E230,0x00563920,0,0,1,1,10,10,0x0056E230,anchored callers 10/10
+0x00576B70,0x0058BF30,4,4,3,3,0,0,0x00576C55,"anchored callees 4/4, globals 3/3"
 0x0057C520,0x00591FC0,0,0,3,3,0,0,0x0057C520,"anchored callees 0/0, globals 3/3"
 0x00585BF0,0x005A51D0,1,1,5,5,1,1,0x00585C4E,"anchored callees 1/1, globals 5/5"
-0x00588BE0,0x00596980,0,0,2,2,2,2,0x00588BE0,anchored callers 2/2
+0x00588BE0,0x00596980,0,0,2,2,4,4,0x00588BE0,anchored callers 4/4
+0x005A0D90,0x005BA040,3,3,1,1,0,0,0x005A0D90,"anchored callees 3/3, globals 1/1"
+0x005A82C0,0x005BDFE0,4,4,1,1,1,1,0x005A82C0,"anchored callees 4/4, globals 1/1"
+0x005B1460,0x005CE430,3,3,2,2,0,0,0x005B1460,"anchored callees 3/3, globals 2/2"
 0x005B1720,0x005CE730,1,1,9,9,0,0,0x005B1947,"anchored callees 1/1, globals 9/9; string literals 1/1"
 0x005DF100,0x005FBE10,0,0,0,0,2,2,0x005DF100,anchored callers 2/2
-0x005E5ED0,0x00603300,3,3,0,0,0,0,0x005E5ED0,"anchored callees 3/3, globals 0/0; string literals 2/2"
-0x005F0360,0x0060F040,7,7,1,1,0,0,0x005F0360,"anchored callees 7/7, globals 1/1"
-0x00601420,0x00621190,3,3,0,0,0,0,0x00601420,"anchored callees 3/3, globals 0/0"
+0x005E4A00,0x00601BF0,4,4,0,0,0,0,0x005E4A00,"anchored callees 4/4, globals 0/0"
+0x005E5ED0,0x00603300,3,3,0,0,1,1,0x005E5ED0,"anchored callees 3/3, globals 0/0; string literals 2/2"
+0x005F0360,0x0060F040,11,11,1,1,0,0,0x005F0360,"anchored callees 11/11, globals 1/1"
+0x00601110,0x00620E70,2,2,0,0,2,2,0x00601110,anchored callers 2/2
+0x00601420,0x00621190,5,5,0,0,0,0,0x00601420,"anchored callees 5/5, globals 0/0"
+0x00601E00,0x00621BA0,3,3,0,0,0,0,0x00601E00,"anchored callees 3/3, globals 0/0"
 0x00608A40,0x00628F60,0,0,0,0,3,3,0x00608A40,anchored callers 3/3
 0x00609FF0,0x0062A5B0,0,0,1,1,2,2,0x00609FF0,anchored callers 2/2
-0x0060C840,0x0062D400,6,6,1,1,0,0,0x0060C840,"anchored callees 6/6, globals 1/1; string literals 1/1"
-0x0060EA90,0x0062FCE0,3,3,6,6,0,0,0x0060EA90,"anchored callees 3/3, globals 6/6"
+0x0060C840,0x0062D400,8,8,1,1,0,0,0x0060C840,"anchored callees 8/8, globals 1/1; string literals 1/1"
+0x0060EA90,0x0062FCE0,15,15,6,6,0,0,0x0060EA90,"anchored callees 15/15, globals 6/6"
 0x00610F20,0x00632440,1,1,0,0,2,2,0x00610F20,anchored callers 2/2
-0x00614720,0x00635FD0,6,6,5,5,1,1,0x00614C8F 0x006151FA,"anchored callees 6/6, globals 5/5"
+0x00614720,0x00635FD0,13,13,5,5,1,1,0x00614C8F 0x006151FA,"anchored callees 13/13, globals 5/5"
 0x00616650,0x00638270,0,0,3,3,0,0,0x00616650 0x00616837,"anchored callees 0/0, globals 3/3"
-0x00644470,0x0066AD40,8,8,5,4,0,0,0x00644A1A 0x00644A27 0x00644A69,"anchored callees 8/8, globals 4/5"
-0x00681740,0x006AD420,0,0,0,0,2,2,0x00681740,anchored callers 2/2
-0x006819D0,0x006AD6C0,0,0,0,0,4,4,0x006819D0,anchored callers 4/4
-0x006872C0,0x006B3630,4,4,3,3,0,0,0x006872C0,"anchored callees 4/4, globals 3/3"
-0x006A0050,0x006CCCE0,0,0,1,1,3,3,0x006A0050,anchored callers 3/3
+0x006181A0,0x00639D20,2,2,0,0,2,2,0x006181A0,anchored callers 2/2
+0x00618280,0x00639E00,2,2,0,0,2,2,0x00618280,anchored callers 2/2
+0x00618970,0x0063A430,3,3,0,0,1,1,0x00618970,"anchored callees 3/3, globals 0/0"
+0x00619B60,0x0063B690,3,3,1,1,2,2,0x00619B60,"anchored callees 3/3, globals 1/1; anchored callers 2/2"
+0x0062D3B0,0x00651EE0,6,6,2,1,0,0,0x0062D3B0,"anchored callees 6/6, globals 1/2"
+0x00644470,0x0066AD40,20,20,5,4,0,0,0x00644A1A 0x00644A27 0x00644A69,"anchored callees 20/20, globals 4/5"
+0x00655F20,0x0067D490,5,5,0,0,0,0,0x00655F20,"anchored callees 5/5, globals 0/0"
+0x00681740,0x006AD420,0,0,0,0,7,7,0x00681740,anchored callers 7/7
+0x006819D0,0x006AD6C0,0,0,0,0,5,5,0x006819D0,anchored callers 5/5
+0x006872C0,0x006B3630,8,8,3,3,0,0,0x006872C0,"anchored callees 8/8, globals 3/3"
+0x006A0050,0x006CCCE0,0,0,1,1,5,5,0x006A0050,anchored callers 5/5
 0x006D1180,0x0070C540,0,0,0,0,2,2,0x006D1180,anchored callers 2/2
-0x00736A50,0x0076F180,3,3,4,4,1,1,0x00736A50,"anchored callees 3/3, globals 4/4; string literals 5/5"
-0x0073A530,0x007730F0,5,5,1,1,0,0,0x0073A530,"anchored callees 5/5, globals 1/1"
-0x00741FD0,0x0077B870,3,3,1,1,0,0,0x00741FD0,"anchored callees 3/3, globals 1/1"
-0x00742300,0x0077BBB0,3,3,2,2,0,0,0x0074278B,"anchored callees 3/3, globals 2/2"
-0x00743C60,0x0077D940,0,0,0,0,4,4,0x00743C60,anchored callers 4/4
-0x00746190,0x00780020,0,0,3,3,0,0,0x00746190,"anchored callees 0/0, globals 3/3; string literals 2/2"
-0x00748710,0x007826D0,3,3,10,10,0,0,0x00748A8D 0x00748A8E 0x00748D9B,"anchored callees 3/3, globals 10/10; string literals 4/4"
+0x00718600,0x007399C0,0,0,0,0,2,2,0x00718600,anchored callers 2/2
+0x00734A40,0x007671B0,1,1,0,0,3,3,0x00734A40,anchored callers 3/3
+0x00736A50,0x0076F180,6,6,4,4,1,1,0x00736A50,"anchored callees 6/6, globals 4/4; string literals 5/5"
+0x0073A530,0x007730F0,9,9,1,1,0,0,0x0073A530,"anchored callees 9/9, globals 1/1"
+0x00741FD0,0x0077B870,5,5,1,1,0,0,0x00741FD0,"anchored callees 5/5, globals 1/1"
+0x00742300,0x0077BBB0,5,5,2,2,0,0,0x0074278B,"anchored callees 5/5, globals 2/2"
+0x00743C60,0x0077D940,0,0,0,0,13,13,0x00743C60,anchored callers 13/13
+0x007452B0,0x0077F0D0,3,3,1,1,0,0,0x0074530B,"anchored callees 3/3, globals 1/1"
+0x00746190,0x00780020,6,6,3,3,1,1,0x00746190,"anchored callees 6/6, globals 3/3; string literals 2/2"
+0x00748710,0x007826D0,12,11,10,10,0,0,0x00748A8D 0x00748A8E 0x00748D9B,"anchored callees 11/12, globals 10/10; string literals 4/4"
+0x00749B70,0x00783B30,0,0,0,0,13,13,0x00749B70,anchored callers 13/13
+0x007C5120,0x007FF0E0,0,0,0,0,2,2,0x007C5120,anchored callers 2/2
+0x007C51A0,0x007FF160,0,0,0,0,2,2,0x007C51A0,anchored callers 2/2
+0x007ECE20,0x00826DE0,1,1,0,0,7,7,0x007ECE20,anchored callers 7/7
+0x007ECEF0,0x00826EB0,1,1,0,0,6,6,0x007ECEF0,anchored callers 6/6
+0x007F0990,0x0082A950,1,1,0,0,8,8,0x007F0990,anchored callers 8/8
+0x007F2CF0,0x0082CCB0,1,1,0,0,2,2,0x007F2CF0,anchored callers 2/2

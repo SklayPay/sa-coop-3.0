@@ -55,6 +55,11 @@ KNOWN = {
 
 SET_SEEDS = {}
 
+# Ghidra Version Tracking match sets that assert equality rather than similarity: the two bodies
+# are byte for byte or instruction for instruction the same. A pair from one of these does not need
+# a second source, the same way `body-insns` does not.
+VT_EXACT_SETS = ("Exact Function Bytes Match", "Exact Function Instructions Match")
+
 # What each source actually measures. Different matchers that share a metric are one signal, not
 # two: match_ghidra.py and match_functions.py both score a function by
 # 0.85 * SequenceMatcher(token sequences) + 0.15 * length ratio and differ only in where they
@@ -62,6 +67,7 @@ SET_SEEDS = {}
 # under two segmentations does not make it independent evidence, so all of them count as `shape`.
 SOURCE_KIND = {
     "ghidra": "vt",             # Ghidra Version Tracking proposal
+    "ghidra-exact": "vt",       # the same tool, but reporting an equality rather than a similarity
     "ghidra-bounds": "shape",   # token matcher over Ghidra's function boundaries
     "insns": "shape",           # token matcher over radare2's function boundaries
     "body-insns": "shape",      # the same metric searched over the whole function list
@@ -310,6 +316,31 @@ def ghirda_functions():
     return out
 
 
+def ghidra_exact():
+    """1.0 -> 3.0 for the pairs Version Tracking reports as an exact match.
+
+    `ghirda_functions` keeps the proposal with the highest confidence, and that is not always the
+    exact one: a reference based match can outrank a byte identical body (for 0x619B60 the exact
+    row has confidence 10 while the reference match has 420). These are the equality sets, so they
+    are read separately. A source with two different exact candidates is ambiguous and dropped.
+    """
+    sets = defaultdict(set)
+    path = TMP / "vt_matches.csv"
+    if not path.exists():
+        return {}
+    for r in csv.DictReader(open(path, encoding="utf-8-sig")):
+        if r["type"] == "Function" and r["set"] in VT_EXACT_SETS:
+            sets[int(r["src"], 16)].add(int(r["dst"], 16))
+    pairs = {v10: next(iter(d)) for v10, d in sets.items() if len(d) == 1}
+    # One 1.0 function can only be one 3.0 function. Where two sources claim the same candidate the
+    # exact sets are ambiguous (a two instruction function is identical in many places), so both
+    # are dropped rather than guessed between.
+    claimed = defaultdict(list)
+    for v10, v30 in pairs.items():
+        claimed[v30].append(v10)
+    return {v10: v30 for v10, v30 in pairs.items() if len(claimed[v30]) == 1}
+
+
 def build_seeds(model, ghidra, include_propagated=True):
     seeds = {}
     sources = {}
@@ -318,6 +349,15 @@ def build_seeds(model, ghidra, include_propagated=True):
         if v10 in model.f10 and v30 in model.f30:
             seeds[v10] = v30
             sources.setdefault(v10, []).append(("ghidra", float(r["similarity"])))
+    # Version Tracking also labels the match set each proposal came from, and two of those sets
+    # assert equality instead of similarity: the bodies are byte or instruction for instruction the
+    # same. That is the exact match the state rule accepts on its own, and it is measured by a tool
+    # that is not part of this pipeline. Where it disagrees with the confidence based proposal, the
+    # exact pair wins.
+    for v10, v30 in ghidra_exact().items():
+        if v10 in model.f10 and v30 in model.f30:
+            seeds[v10] = v30
+            sources.setdefault(v10, []).append(("ghidra-exact", 1.0))
     path = TMP / "function_matches_ghidra.csv"
     if path.exists():
         for r in csv.DictReader(open(path, encoding="utf-8-sig")):
@@ -597,7 +637,8 @@ def main():
                     conflict = any(s.startswith("conflict") for s, _ in src)
                     # The near-exact body rule is accepted on its own: it means the two bodies are
                     # the same instruction sequence, which is stronger than counting sources.
-                    exact = any(s == "body-insns" for s, _ in src)
+                    # Ghidra's exact match sets say the same thing from the outside.
+                    exact = any(s in ("body-insns", "ghidra-exact") for s, _ in src)
                     # Conflicting evidence must never yield a confirmed row on its own; a
                     # reviewed manual seed or a cross-verified function pair is allowed to
                     # override the conflict.
