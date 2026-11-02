@@ -2,15 +2,15 @@
 
 ## Состояние
 
-Инфраструктура порта готова, таблица адресов заполнена на 83 %, но **3.0 пока не включена**:
-мод распознаёт её и выключается с понятным сообщением. Это намеренно — клиент работает с 552
+Инфраструктура порта готова, таблица адресов заполнена на 91 %, но **3.0 пока не включена**:
+мод распознаёт её и выключается с понятным сообщением. Это намеренно — клиент работает с 507
 уникальными литеральными адресами образа 1.0 US, и если адреса нет в таблице, вызов функции
 или чтение глобальной переменной попадёт в чужое место.
 
 Что сделано:
 
 - определение версии `gta_sa.exe` — `src/client/shared/game/version/GameVersion.cpp`;
-- все версионные адреса — `src/client/shared/game/version/Addresses.cpp` (254 записи);
+- все версионные адреса — `src/client/shared/game/version/Addresses.cpp` (326 записей);
 - `game::version::Resolve` переводит адрес 1.0 в адрес текущей версии; на 1.0 US это
   тождественная операция, поэтому поведение 1.0 не меняется;
 - `game::Ref`, `Call`, `CallMethod`, `CallStd`, `Ref10`, `Call10`, `Ptr10` используют `Resolve`;
@@ -77,8 +77,11 @@ Steam-враппером):
 4. `consolidate.py` сводит всё в `docs/port/mapping.csv`, переводит отдельные адреса внутри
    функций по выравниванию инструкций и помечает состояние.
 5. Ручные проверенные пары из `docs/port/manual_seeds.csv` имеют приоритет.
-6. `gen_addresses.py` переносит в `Addresses.cpp` только `confirmed`.
-7. `validate_mapping.py` проверяет, что каждая запись попадает в правильную секцию и (для
+6. `verify_xref.py` независимо перепроверяет кандидатов по множествам вызываемых функций и
+   глобальных переменных, опираясь только на уже подтверждённые пары; результат —
+   `docs/port/xref_verified.csv`.
+7. `gen_addresses.py` переносит в `Addresses.cpp` только `confirmed`.
+8. `validate_mapping.py` проверяет, что каждая запись попадает в правильную секцию и (для
    функций) в реальное начало функции 3.0.
 
 ## Как добавить адрес
@@ -95,24 +98,30 @@ Steam-враппером):
 
 ```powershell
 uv run --with capstone --with pefile --python 3.12 python tools/port/consolidate.py
+uv run --with capstone --with pefile --python 3.12 python tools/port/verify_xref.py
+uv run --with capstone --with pefile --python 3.12 python tools/port/consolidate.py
 uv run --python 3.12 python tools/port/gen_addresses.py --apply
 uv run --with capstone --with pefile --python 3.12 python tools/port/validate_mapping.py
 ```
+
+Порядок важен: `verify_xref.py` берёт подтверждённые пары из `mapping.csv`, пишет
+`docs/port/xref_verified.csv`, а второй запуск `consolidate.py` уже учитывает его как
+самостоятельный источник. Повторный прогон доходит до неподвижной точки.
 
 ## Состояние таблицы
 
 | Состояние | Всего | func | data | code |
 |---|---|---|---|---|
-| `confirmed` | 251 | 117 | 103 | 31 |
-| `single` | 208 | 135 | 35 | 38 |
-| `missing` | 93 | — | 27 | 66 |
+| `confirmed` | 316 | 129 | 136 | 51 |
+| `single` | 147 | 115 | 24 | 8 |
+| `missing` | 44 | — | — | — |
 
 `single` в `Addresses.cpp` не попадает: на 3.0 такой адрес не пропатчится (в лог уйдёт
 ошибка). `missing` — перевода нет.
 
 ## Что должно быть покрыто до включения 3.0
 
-- все 552 адреса должны быть `confirmed` (сейчас 251);
+- все 507 адресов должны быть `confirmed` (сейчас 316);
 - проверить ABI и смещения структур (`CPed`, `CVehicle`, `CPad`, `CPlayerInfo`, пулы, камера):
   на 3.0 часть layout'ов сдвинута (например, `CTimer`);
 - проверить script-переменные и миссии: в 3.0 может быть другой `main.scm`;

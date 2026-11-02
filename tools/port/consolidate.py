@@ -263,6 +263,21 @@ def build_seeds(model, ghidra, include_propagated=True):
                 continue
             seeds[v10] = v30
             sources.setdefault(v10, []).append(("calls", 0.9))
+    # Cross-verified pairs: verify_xref.py re-derives a candidate from the references its two
+    # functions make and only keeps a pair when every anchored callee and global of the 1.0 body
+    # resolves to the mapped counterpart in the 3.0 body. Different compilers produced the two
+    # builds, so this agreement is independent of instruction layout and of Ghidra's own match.
+    path = ROOT / "docs/port/xref_verified.csv"
+    if path.exists():
+        for r in csv.DictReader(open(path, encoding="utf-8-sig")):
+            v10, v30 = int(r["v10"], 16), int(r["v30"], 16)
+            if v10 not in model.f10 or v30 not in model.f30:
+                continue
+            if v10 in seeds and seeds[v10] != v30:
+                sources.setdefault(v10, []).append(("conflict-xref", 1.0))
+                continue
+            seeds[v10] = v30
+            sources.setdefault(v10, []).append(("xref-ver", 1.0))
     # Hand-checked pairs: call-graph fingerprints, masked byte patterns and 1.0 HOODLUM
     # trampolines whose body was identified by disassembly. They are kept in the repository so
     # the pipeline can be reproduced without the temporary matcher output.
@@ -404,11 +419,13 @@ def main():
                     src = sources.get(addr10(f), [])
                     conf = [s for s, q in src if q >= 0.9]
                     manual = any(s == "manual" for s, _ in src)
+                    verified = any(s == "xref-ver" for s, _ in src)
                     conflict = any(s.startswith("conflict") for s, _ in src)
                     # Conflicting evidence must never yield a confirmed row on its own; a
-                    # reviewed manual seed is allowed to override the conflict.
-                    strong = strong and (manual or not conflict)
-                    row["state"] = "confirmed" if (strong and (len(conf) >= 2 or manual)) else "single"
+                    # reviewed manual seed or a cross-verified function pair is allowed to
+                    # override the conflict.
+                    strong = strong and (verified or manual or not conflict)
+                    row["state"] = "confirmed" if (verified or (strong and (len(conf) >= 2 or manual))) else "single"
                     row["sources"] = "+".join(sorted({s for s, _ in src}))
         if not row["v30"] and target >= 0x8A4000:
             # data target: find a code reference in 1.0 and translate the operand
@@ -440,6 +457,8 @@ def main():
         stats[row["state"]] += 1
         rows.append(row)
 
+    delta_promote(model, rows, stats)
+
     with open(OUT, "w", newline="", encoding="utf-8") as fp:
         w = csv.DictWriter(fp, fieldnames=list(rows[0]))
         w.writeheader()
@@ -451,6 +470,44 @@ def main():
         w.writerows(high)
     print("states:", dict(stats))
     print(f"written {OUT} and {OUT_HIGH} ({len(high)})")
+
+
+def delta_promote(model, rows, stats):
+    """Confirm data rows whose candidate matches the delta of confirmed neighbours.
+
+    Globals of one struct or array move together between the two builds, so a candidate whose
+    distance to its 3.0 address equals the distance of confirmed neighbours is supported by
+    them. The delta must also be the strict majority nearby, otherwise the region changed shape
+    and the signal says nothing. Only rows that already carry a candidate are upgraded, so the
+    row ends up with two independent signals. Confirming one element makes it a neighbour of the
+    next, which is why the pass runs to a fixed point.
+    """
+    for _ in range(8):
+        anchors = {int(r["v10"], 16): int(r["v30"], 16) for r in rows
+                   if r["state"] == "confirmed" and r["kind"] == "data" and r["v30"]}
+        keys = sorted(anchors)
+        changed = 0
+        for r in rows:
+            if r["kind"] != "data" or r["state"] == "confirmed" or not r["v30"]:
+                continue
+            v10 = int(r["v10"], 16)
+            delta = int(r["v30"], 16) - v10
+            lo = bisect.bisect_left(keys, v10 - 0x400)
+            hi = bisect.bisect_right(keys, v10 + 0x400)
+            votes = Counter(anchors[a] - a for a in keys[lo:hi] if a != v10)
+            if not votes or votes.most_common(1)[0][0] != delta:
+                continue
+            agree = votes[delta]
+            other = sum(n for d, n in votes.items() if d != delta)
+            if agree < 2 or agree <= other:
+                continue
+            r["state"] = "confirmed"
+            r["sources"] = (r["sources"] + "+delta-nb") if r["sources"] else "delta-nb"
+            stats["single"] -= 1
+            stats["confirmed"] += 1
+            changed += 1
+        if not changed:
+            break
 
 
 def find_data_refs(model, target):
