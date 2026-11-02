@@ -656,33 +656,61 @@ def main():
 
 
 def delta_promote(model, rows, stats):
-    """Confirm data rows whose candidate matches the delta of confirmed neighbours.
+    """Confirm rows whose candidate matches the delta of confirmed neighbours.
 
-    Globals of one struct or array move together between the two builds, so a candidate whose
-    distance to its 3.0 address equals the distance of confirmed neighbours is supported by
-    them. The delta must also be the strict majority nearby, otherwise the region changed shape
-    and the signal says nothing. Only rows that already carry a candidate are upgraded, so the
-    row ends up with two independent signals. Confirming one element makes it a neighbour of the
-    next, which is why the pass runs to a fixed point.
+    Globals of one struct or array move together between the two builds, and so do functions that
+    sit next to each other, since 3.0 is the same code recompiled. A candidate whose distance from
+    its 1.0 address equals the distance of already confirmed neighbours is therefore supported by
+    them, through address arithmetic - a measurement that has nothing to do with the body matchers.
+    Only rows that already carry a candidate are upgraded, so the row ends up with two independent
+    signals. Confirming one element makes it a neighbour of the next, which is why the pass runs to
+    a fixed point.
+
+    For data the delta must also be the strict majority nearby, otherwise the region changed shape
+    and the signal says nothing. For functions the window has to be much tighter: leaving each
+    confirmed pair out and asking its neighbours to predict it is right for every pair within 0x100
+    (38 of 38) but falls to 18% at 0x100-0x400, because one inserted or removed function shifts the
+    spacing of everything after it.
     """
     for _ in range(8):
-        anchors = {int(r["v10"], 16): int(r["v30"], 16) for r in rows
-                   if r["state"] == "confirmed" and r["kind"] == "data" and r["v30"]}
-        keys = sorted(anchors)
+        data = {int(r["v10"], 16): int(r["v30"], 16) for r in rows
+                if r["state"] == "confirmed" and r["kind"] == "data" and r["v30"]}
+        func = sorted((int(r["v10"], 16), int(r["v30"], 16)) for r in rows
+                      if r["state"] == "confirmed" and r["kind"] == "func" and r["v30"])
+        fkeys = [a for a, _ in func]
+        fdel = dict(func)
+        taken = {b for _, b in func}
         changed = 0
         for r in rows:
-            if r["kind"] != "data" or r["state"] == "confirmed" or not r["v30"]:
+            if r["state"] == "confirmed" or not r["v30"]:
                 continue
             v10 = int(r["v10"], 16)
-            delta = int(r["v30"], 16) - v10
-            lo = bisect.bisect_left(keys, v10 - 0x400)
-            hi = bisect.bisect_right(keys, v10 + 0x400)
-            votes = Counter(anchors[a] - a for a in keys[lo:hi] if a != v10)
-            if not votes or votes.most_common(1)[0][0] != delta:
-                continue
-            agree = votes[delta]
-            other = sum(n for d, n in votes.items() if d != delta)
-            if agree < 2 or agree <= other:
+            v30 = int(r["v30"], 16)
+            delta = v30 - v10
+            if r["kind"] == "data":
+                keys = sorted(data)
+                lo = bisect.bisect_left(keys, v10 - 0x400)
+                hi = bisect.bisect_right(keys, v10 + 0x400)
+                votes = Counter(data[a] - a for a in keys[lo:hi] if a != v10)
+                if not votes or votes.most_common(1)[0][0] != delta:
+                    continue
+                agree = votes[delta]
+                other = sum(n for d, n in votes.items() if d != delta)
+                if agree < 2 or agree <= other:
+                    continue
+            elif r["kind"] == "func":
+                if v30 in taken:
+                    continue          # two functions cannot be the same 3.0 function
+                lo = bisect.bisect_left(fkeys, v10 - 0x100)
+                hi = bisect.bisect_right(fkeys, v10 + 0x100)
+                near = sorted((abs(a - v10), fdel[a] - a) for a in fkeys[lo:hi] if a != v10)
+                if not near:
+                    continue
+                closest = {d for dist, d in near if dist == near[0][0]}
+                if closest != {delta}:
+                    continue
+                taken.add(v30)
+            else:
                 continue
             r["state"] = "confirmed"
             r["sources"] = (r["sources"] + "+delta-nb") if r["sources"] else "delta-nb"

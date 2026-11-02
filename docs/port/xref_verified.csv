@@ -16,7 +16,9 @@ v10,v30,callees,callees_hit,globals,globals_hit,callers,callers_hit,rows,evidenc
 0x00486B00,0x0048D0F0,5,5,0,0,1,1,0x00486B00,"anchored callees 5/5, globals 0/0"
 0x00496E00,0x0049E4D0,1,0,10,10,0,0,0x00498D54 0x00498D6A,"anchored callees 0/1, globals 10/10; string literals 1/1"
 0x0049CEC0,0x004A48C0,0,0,1,1,0,0,0x0049CEC0,string literals 2/2
-0x004AB420,0x004B4AA0,0,0,0,0,3,3,0x004AB420,anchored callers 3/3
+0x004AB420,0x004B4AA0,0,0,0,0,4,4,0x004AB420,anchored callers 4/4
+0x004B0A00,0x004BA180,0,0,0,0,2,2,0x004B0A00,anchored callers 2/2
+0x004B0A50,0x004BA1D0,0,0,0,0,2,2,0x004B0A50,anchored callers 2/2
 0x004B3440,0x004BCCA0,3,3,0,0,0,0,0x004B3440,"anchored callees 3/3, globals 0/0"
 0x004B50B0,0x004BE980,3,3,0,0,0,0,0x004B50B0,"anchored callees 3/3, globals 0/0"
 0x004D4610,0x004DF050,0,0,2,2,5,5,0x004D4610,anchored callers 5/5
@@ -47,18 +49,19 @@ v10,v30,callees,callees_hit,globals,globals_hit,callers,callers_hit,rows,evidenc
 0x00588BE0,0x00596980,0,0,2,2,2,2,0x00588BE0,anchored callers 2/2
 0x005B1720,0x005CE730,1,1,9,9,0,0,0x005B1947,"anchored callees 1/1, globals 9/9; string literals 1/1"
 0x005DF100,0x005FBE10,0,0,0,0,2,2,0x005DF100,anchored callers 2/2
-0x005E5ED0,0x00603300,2,2,0,0,0,0,0x005E5ED0,string literals 2/2
+0x005E5ED0,0x00603300,3,3,0,0,0,0,0x005E5ED0,"anchored callees 3/3, globals 0/0; string literals 2/2"
 0x005F0360,0x0060F040,7,7,1,1,0,0,0x005F0360,"anchored callees 7/7, globals 1/1"
+0x00601420,0x00621190,3,3,0,0,0,0,0x00601420,"anchored callees 3/3, globals 0/0"
 0x00608A40,0x00628F60,0,0,0,0,3,3,0x00608A40,anchored callers 3/3
 0x00609FF0,0x0062A5B0,0,0,1,1,2,2,0x00609FF0,anchored callers 2/2
-0x0060C840,0x0062D400,5,5,1,1,0,0,0x0060C840,"anchored callees 5/5, globals 1/1; string literals 1/1"
+0x0060C840,0x0062D400,6,6,1,1,0,0,0x0060C840,"anchored callees 6/6, globals 1/1; string literals 1/1"
 0x0060EA90,0x0062FCE0,3,3,6,6,0,0,0x0060EA90,"anchored callees 3/3, globals 6/6"
 0x00610F20,0x00632440,1,1,0,0,2,2,0x00610F20,anchored callers 2/2
 0x00614720,0x00635FD0,6,6,5,5,1,1,0x00614C8F 0x006151FA,"anchored callees 6/6, globals 5/5"
 0x00616650,0x00638270,0,0,3,3,0,0,0x00616650 0x00616837,"anchored callees 0/0, globals 3/3"
-0x00644470,0x0066AD40,7,7,5,4,0,0,0x00644A1A 0x00644A27 0x00644A69,"anchored callees 7/7, globals 4/5"
+0x00644470,0x0066AD40,8,8,5,4,0,0,0x00644A1A 0x00644A27 0x00644A69,"anchored callees 8/8, globals 4/5"
 0x00681740,0x006AD420,0,0,0,0,2,2,0x00681740,anchored callers 2/2
-0x006819D0,0x006AD6C0,0,0,0,0,3,3,0x006819D0,anchored callers 3/3
+0x006819D0,0x006AD6C0,0,0,0,0,4,4,0x006819D0,anchored callers 4/4
 0x006872C0,0x006B3630,4,4,3,3,0,0,0x006872C0,"anchored callees 4/4, globals 3/3"
 0x006A0050,0x006CCCE0,0,0,1,1,3,3,0x006A0050,anchored callers 3/3
 0x006D1180,0x0070C540,0,0,0,0,2,2,0x006D1180,anchored callers 2/2

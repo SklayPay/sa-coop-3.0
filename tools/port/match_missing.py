@@ -135,6 +135,15 @@ def main():
         w = csv.writer(fp)
         w.writerow(["v10", "v10_body", "trampoline", "v30", "score", "ratio", "lenratio",
                     "callees", "callees_hit", "globals", "globals_hit", "verified"])
+        # consolidate.py reads this file for the near-exact body signal, and a row that has since
+        # been confirmed by another source must not lose the candidate that helped confirm it.
+        # Rewriting only the rows that are still missing would make the tool drop its own work the
+        # next time it runs, so anything not recomputed now is carried over.
+        recomputed = {r["v10"] for r in rows}
+        if OUT.exists():
+            for old in csv.DictReader(open(OUT, encoding="utf-8-sig")):
+                if old["v10"] not in recomputed:
+                    w.writerow(list(old.values()))
         for r, body, chain, scored, verified in results:
             for score, ratio, lr, va, s, ok in scored:
                 w.writerow([r["v10"], f"0x{body:08X}", "yes" if chain else "no",
